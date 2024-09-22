@@ -198,7 +198,7 @@ public class AccountControllerTest {
         verify(userService, never()).save(any(User.class));
     }
 
-    @Test @Disabled
+    @Test
     public void testUpdateAccountInfo_InvalidCity() throws IOException {
         UserInfoRequestDTO requestDTO = new UserInfoRequestDTO(
                 "example@user.com", "John Doe", "Rio de Janeiro", "RJ", 0, "123456789"
