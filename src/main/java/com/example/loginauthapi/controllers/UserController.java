@@ -18,7 +18,7 @@ public class UserController {
     private final TokenService tokenService;
 
     @GetMapping
-    @RequestMapping("get")
+    @RequestMapping(value = "get", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> getUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         try {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {

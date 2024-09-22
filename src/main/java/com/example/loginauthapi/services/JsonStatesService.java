@@ -6,6 +6,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -15,9 +16,11 @@ public class JsonStatesService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public List<Map<String, String>> loadStates() throws IOException {
-        // Load the JSON file from resources
+        // Load the JSON file from resources as InputStream
         ClassPathResource resource = new ClassPathResource("data/states.json");
-        return objectMapper.readValue(resource.getFile(), new TypeReference<List<Map<String, String>>>() {});
+        try (InputStream inputStream = resource.getInputStream()) {
+            return objectMapper.readValue(inputStream, new TypeReference<List<Map<String, String>>>() {});
+        }
     }
 
     public String getStateIdBySigla(String sigla) throws IOException {

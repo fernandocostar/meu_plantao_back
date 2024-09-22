@@ -1,5 +1,6 @@
 package com.example.loginauthapi.domain.shift;
 
+import com.example.loginauthapi.domain.location.Location;
 import com.example.loginauthapi.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -26,8 +27,11 @@ public class Shift {
     private LocalDateTime endTime;
     @Column(nullable = false)
     private double value;
-    @Column(nullable = false)
-    private String location;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
 
     @JsonIgnoreProperties("shifts")
     @ManyToOne(fetch = FetchType.LAZY)

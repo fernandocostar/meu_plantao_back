@@ -3,10 +3,10 @@ package com.example.loginauthapi.controllers;
 import com.example.loginauthapi.domain.user.User;
 import com.example.loginauthapi.dto.auth.AuthLoginRequestDTO;
 import com.example.loginauthapi.dto.auth.AuthRegisterRequestDTO;
-import com.example.loginauthapi.dto.auth.ErrorResponseDTO;
+import com.example.loginauthapi.dto.ErrorResponseDTO;
 import com.example.loginauthapi.dto.auth.ResponseDTO;
 import com.example.loginauthapi.infra.security.TokenService;
-import com.example.loginauthapi.repositories.UserRepository;
+import com.example.loginauthapi.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -23,14 +22,14 @@ import java.util.Optional;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", produces = "application/json; charset=UTF-8")
     public ResponseEntity login(@RequestBody AuthLoginRequestDTO body) {
         try {
-            User user = this.userRepository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("Invalid email or password, please try again"));
+            User user = this.userService.getByEmail(body.email()).orElseThrow(() -> new RuntimeException("Invalid email or password, please try again"));
             if (passwordEncoder.matches(body.password(), user.getPassword())) {
                 String token = this.tokenService.generateToken(user);
                 return ResponseEntity.ok(new ResponseDTO(user.getName(), token, user.getEmail()));
@@ -43,9 +42,9 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", produces = "application/json; charset=UTF-8")
     public ResponseEntity register(@RequestBody AuthRegisterRequestDTO body){
-        Optional<User> user = this.userRepository.findByEmail(body.email());
+        Optional<User> user = this.userService.getByEmail(body.email());
 
         if(user.isEmpty()) {
             User newUser = new User();
@@ -56,7 +55,7 @@ public class AuthController {
             newUser.setProfessionalRegister(body.professionalRegister());
             newUser.setState(body.state());
             newUser.setCity(body.city());
-            this.userRepository.save(newUser);
+            this.userService.save(newUser);
 
             String token = this.tokenService.generateToken(newUser);
             return ResponseEntity.ok(new ResponseDTO(newUser.getName(), token, newUser.getEmail()));

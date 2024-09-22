@@ -1,5 +1,6 @@
 package com.example.loginauthapi.domain.user;
 
+import com.example.loginauthapi.domain.location.Location;
 import com.example.loginauthapi.domain.shift.Shift;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -35,4 +36,8 @@ public class User {
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Shift> shifts;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Location> locations;
+
 }

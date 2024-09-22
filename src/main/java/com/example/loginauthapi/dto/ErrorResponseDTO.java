@@ -1,3 +1,3 @@
-package com.example.loginauthapi.dto.auth;
+package com.example.loginauthapi.dto;
 
 public record ErrorResponseDTO (String error) { }

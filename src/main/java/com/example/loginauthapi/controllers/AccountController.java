@@ -29,7 +29,7 @@ public class AccountController {
     private final JsonStatesService jsonStatesService;
     private final JsonCitiesService jsonCitiesService;
 
-    @GetMapping("/info")
+    @GetMapping(value = "/info", produces = "application/json; charset=UTF-8")
     public ResponseEntity<UserInfoResponseDTO> getAccountInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         try {
             String token = extractAuthorizationToken(authorizationHeader);
@@ -60,7 +60,7 @@ public class AccountController {
         }
     }
 
-    @PostMapping("/update")
+    @PostMapping(value = "/update", produces = "application/json; charset=UTF-8")
     public ResponseEntity<UserInfoResponseDTO> updateAccountInfo(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @RequestBody UserInfoRequestDTO body) {

@@ -6,9 +6,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class JsonCitiesService {
@@ -16,9 +16,11 @@ public class JsonCitiesService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public List<Map<String, String>> loadCities() throws IOException {
-        // Load the JSON file from resources
+        // Load the JSON file from resources as InputStream
         ClassPathResource resource = new ClassPathResource("data/cities.json");
-        return objectMapper.readValue(resource.getFile(), new TypeReference<List<Map<String, String>>>() {});
+        try (InputStream inputStream = resource.getInputStream()) {
+            return objectMapper.readValue(inputStream, new TypeReference<List<Map<String, String>>>() {});
+        }
     }
 
     public boolean isCityValid(String cityName, String stateId) throws IOException {
