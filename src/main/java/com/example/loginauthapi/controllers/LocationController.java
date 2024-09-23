@@ -10,6 +10,7 @@ import com.example.loginauthapi.repositories.ShiftRepository;
 import com.example.loginauthapi.repositories.UserRepository;
 import com.example.loginauthapi.services.LocationService;
 import com.example.loginauthapi.services.ShiftService;
+import com.example.loginauthapi.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +32,12 @@ public class LocationController {
     private static final Logger log = LoggerFactory.getLogger(LocationController.class);
     @Autowired
     LocationService locationService;
-    @Autowired
-    LocationRepository locationRepository;
+
     @Autowired
     TokenService tokenService;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @GetMapping(value = "/getUserLocations", produces = "application/json; charset=UTF-8")
     public ResponseEntity<List<Location>> getUserLocations(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
@@ -51,7 +51,7 @@ public class LocationController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
             }
 
-            List<Location> userLocations = locationService.findByUser(userRepository.findByEmail(userEmail).get());
+            List<Location> userLocations = locationService.findByUser(userService.getByEmail(userEmail).get());
 
             return ResponseEntity.ok(userLocations);
 
@@ -74,7 +74,7 @@ public class LocationController {
 
                 Location newLocation = new Location();
                 newLocation.setName(body.name());
-                newLocation.setUser(userRepository.findByEmail(userEmail).get());
+                newLocation.setUser(userService.getByEmail(userEmail).get());
                 newLocation.setActive(true);
                 this.locationService.save(newLocation);
 
@@ -97,11 +97,11 @@ public class LocationController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
 
-            Location location = locationRepository.findById(id).get();
+            Location location = locationService.findById(id).get();
 
             if(location.getUser().getEmail().equals(userEmail)) {
                 location.setActive(false);
-                locationRepository.save(location);
+                locationService.save(location);
                 return ResponseEntity.ok(id + "location deleted");
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -124,7 +124,7 @@ public class LocationController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
 
-            Optional<Location> optionalLocation = locationRepository.findById(id);
+            Optional<Location> optionalLocation = locationService.findById(id);
             if (optionalLocation.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
@@ -132,7 +132,7 @@ public class LocationController {
 
             if(location.getUser().getEmail().equals(userEmail)) {
                 location.setName(body.name());
-                this.locationRepository.save(location);
+                this.locationService.save(location);
                 return ResponseEntity.ok(location);
             } else {
                 System.out.println(location.getUser().getEmail());
