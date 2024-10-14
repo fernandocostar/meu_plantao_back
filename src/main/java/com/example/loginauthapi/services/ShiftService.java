@@ -34,4 +34,14 @@ public class ShiftService {
     public void deleteById(Long id) {
         shiftRepository.deleteById(id);
     }
+
+    public boolean setPassing(Shift shift, boolean passing) {
+        try {
+            shift.setPassing(passing);
+            shiftRepository.save(shift);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -2,8 +2,11 @@ package com.example.loginauthapi.domain.user;
 
 import com.example.loginauthapi.domain.location.Location;
 import com.example.loginauthapi.domain.shift.Shift;
+import com.example.loginauthapi.domain.shiftpass.ShiftPass;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,5 +42,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Location> locations;
+
+    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ShiftPass> createdShiftPasses;
+
+    @ManyToMany(mappedBy = "offeredUsers", fetch = FetchType.LAZY)
+    @JsonBackReference
+    private List<ShiftPass> offeredShiftPasses;
+
 
 }

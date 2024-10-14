@@ -24,4 +24,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public List<User> getUsersListByIds(List<String> userIds) {
+        return userRepository.findAllById(userIds);
+    }
+
 }

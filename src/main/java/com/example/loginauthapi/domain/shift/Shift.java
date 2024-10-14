@@ -27,6 +27,8 @@ public class Shift {
     private LocalDateTime endTime;
     @Column(nullable = false)
     private double value;
+    @Column(name = "passing")
+    private Boolean passing;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

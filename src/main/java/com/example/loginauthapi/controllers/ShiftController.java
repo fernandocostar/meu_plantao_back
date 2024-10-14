@@ -8,6 +8,7 @@ import com.example.loginauthapi.repositories.ShiftRepository;
 import com.example.loginauthapi.repositories.UserRepository;
 import com.example.loginauthapi.services.ShiftService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/shifts")
 @RequiredArgsConstructor
 public class ShiftController {
 
-    private static final Logger log = LoggerFactory.getLogger(ShiftController.class);
     @Autowired
     ShiftService shiftService;
     @Autowired
@@ -55,6 +56,7 @@ public class ShiftController {
             return ResponseEntity.ok(userShifts);
 
         } catch (Exception e) {
+            log.error("Error getting shifts", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.emptyList());
         }
     }
@@ -98,11 +100,20 @@ public class ShiftController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
 
-            Shift shift = shiftRepository.findById(id).get();
+            Optional<Shift> optionalShift = shiftRepository.findById(id);
+            if (optionalShift.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            Shift shift = optionalShift.get();
+
+            if(Boolean.TRUE.equals(shift.getPassing())) {
+                log.info(String.format("[%s] Shift is passing, cannot delete", shift.getId()));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
 
             if(shift.getUser().getEmail().equals(userEmail)) {
                 shiftRepository.delete(shift);
-                return ResponseEntity.ok(id + "shift deleted");
+                return ResponseEntity.ok(id + " shift deleted");
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
@@ -129,6 +140,11 @@ public class ShiftController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
             Shift shift = optionalShift.get();
+
+            if(Boolean.TRUE.equals(shift.getPassing())) {
+                log.info("Shift %s is passing, cannot update", shift.getId());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
 
             if(shift.getUser().getEmail().equals(userEmail)) {
                 shift.setStartTime(body.startTime());
