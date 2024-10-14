@@ -32,6 +32,16 @@ public class ShiftPassService {
         return shiftPassRepository.findById(id);
     }
 
+    public List<ShiftPass> getOfferedShiftsByUserEmail(String userEmail) {
+        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        if (optionalUser.isEmpty()) {
+            return emptyList();
+        }
+
+        User user = optionalUser.get();
+        return shiftPassRepository.findByOfferedUsersContaining(user);
+    }
+
     public void save(ShiftPass shiftPass) {
         shiftPassRepository.save(shiftPass);
     }

@@ -58,6 +58,10 @@ public class ShiftPassController {
         log.info("[{}] {}", shiftPassId, action);
     }
 
+    private void logUserAction(String action, String userEmail) {
+        log.info("[{}] {}", userEmail, action);
+    }
+
     // Helper to get a shift and return appropriate response if not found
     private ResponseEntity<Shift> getShiftOrNotFound(Long shiftId) {
         Optional<Shift> optionalShift = shiftService.findById(shiftId);
@@ -66,6 +70,23 @@ public class ShiftPassController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.of(optionalShift);
+    }
+
+    @GetMapping(value="/get/offeredShifts")
+    public ResponseEntity<List<ShiftPass>> getOfferedShifts(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+
+        Optional<String> userEmailOpt = validateAuthorization(authorizationHeader);
+        if (userEmailOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String userEmail = userEmailOpt.get();
+
+        logUserAction("Getting offered shifts", userEmail);
+
+        List<ShiftPass> offeredShifts = shiftPassService.getOfferedShiftsByUserEmail(userEmail);
+
+        logUserAction("Offered shifts returned", userEmail);
+        return ResponseEntity.ok(offeredShifts);
     }
 
     @GetMapping(value = "/get/{shift_pass_id}")
