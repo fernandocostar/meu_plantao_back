@@ -1,6 +1,4 @@
-package com.example.loginauthapi.dto;
-
-import com.example.loginauthapi.domain.user.User;
+package com.example.loginauthapi.dto.shiftpass;
 
 import java.util.List;
 

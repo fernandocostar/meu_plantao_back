@@ -3,10 +3,8 @@ package com.example.loginauthapi.domain.user;
 import com.example.loginauthapi.domain.location.Location;
 import com.example.loginauthapi.domain.shift.Shift;
 import com.example.loginauthapi.domain.shiftpass.ShiftPass;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +24,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     @JsonIgnore
     private String id;
+
     private String name;
     private String email;
     private String professionalRegister;
@@ -36,6 +35,7 @@ public class User {
     @JsonIgnore
     private String password;
 
+    // Ignore circular reference when serializing shifts
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Shift> shifts;
@@ -43,13 +43,13 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Location> locations;
 
+    // Ignore the reference to user in ShiftPass to prevent recursion
+    @JsonIgnoreProperties({"createdBy", "offeredUsers", "finalUser"})
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    @JsonManagedReference
     private List<ShiftPass> createdShiftPasses;
 
+    // Use @JsonIgnore here to avoid recursion with offered shift passes
+    @JsonIgnore
     @ManyToMany(mappedBy = "offeredUsers", fetch = FetchType.LAZY)
-    @JsonBackReference
     private List<ShiftPass> offeredShiftPasses;
-
-
 }

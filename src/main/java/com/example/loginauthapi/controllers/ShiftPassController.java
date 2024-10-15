@@ -4,9 +4,10 @@ import com.example.loginauthapi.domain.location.Location;
 import com.example.loginauthapi.domain.shift.Shift;
 import com.example.loginauthapi.domain.shiftpass.ShiftPass;
 import com.example.loginauthapi.domain.user.User;
-import com.example.loginauthapi.dto.OfferedShiftPassesResponse;
-import com.example.loginauthapi.dto.ShiftPassRequest;
-import com.example.loginauthapi.dto.ShiftPassResponse;
+import com.example.loginauthapi.dto.shiftpass.OfferedShiftPassesResponse;
+import com.example.loginauthapi.dto.shiftpass.ShiftPassRequest;
+import com.example.loginauthapi.dto.shiftpass.ShiftPassActionResponse;
+import com.example.loginauthapi.dto.shiftpass.ShiftPassResponse;
 import com.example.loginauthapi.infra.security.TokenService;
 import com.example.loginauthapi.services.LocationService;
 import com.example.loginauthapi.services.ShiftPassService;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -93,7 +93,7 @@ public class ShiftPassController {
     }
 
     @GetMapping(value = "/get/{shift_pass_id}")
-    public ResponseEntity<ShiftPass> getShiftPass(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @PathVariable("shift_pass_id") Long shiftPassId) {
+    public ResponseEntity<ShiftPassResponse> getShiftPass(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @PathVariable("shift_pass_id") Long shiftPassId) {
 
         logShiftPassAction("Getting shift pass", shiftPassId);
 
@@ -109,14 +109,16 @@ public class ShiftPassController {
         }
 
         ShiftPass shiftPass = optionalShiftPass.get();
+        ShiftPassResponse shiftPassResponse = new ShiftPassResponse(shiftPass);
+
         logShiftPassAction("Shift pass returned", shiftPassId);
         log.debug(shiftPass.toString());
 
-        return ResponseEntity.ok(shiftPass);
+        return ResponseEntity.ok(shiftPassResponse);
     }
 
     @GetMapping(value = "/get/")
-    public ResponseEntity<ShiftPass> getShiftPassByShiftId(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestParam("originShiftId") Long originShiftId) {
+    public ResponseEntity<ShiftPassResponse> getShiftPassByShiftId(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestParam("originShiftId") Long originShiftId) {
 
         Optional<String> userEmailOpt = validateAuthorization(authorizationHeader);
         if (userEmailOpt.isEmpty()) {
@@ -132,13 +134,15 @@ public class ShiftPassController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
+        ShiftPassResponse shiftPassResponse = new ShiftPassResponse(shiftPass);
+
         logShiftPassAction("Returning shift pass", shiftPass.getId());
 
-        return ResponseEntity.ok(shiftPass);
+        return ResponseEntity.ok(shiftPassResponse);
     }
 
     @PostMapping(value = "/create/")
-    public ResponseEntity<ShiftPassResponse> createShiftPass(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody ShiftPassRequest requestBody) {
+    public ResponseEntity<ShiftPassActionResponse> createShiftPass(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody ShiftPassRequest requestBody) {
 
         Optional<String> userEmailOpt = validateAuthorization(authorizationHeader);
         if (userEmailOpt.isEmpty()) {
@@ -156,7 +160,7 @@ public class ShiftPassController {
 
         if (Boolean.TRUE.equals(originShift.getPassing())) {
             log.info("[{}] Shift already has a pass", originShift.getId());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ShiftPassResponse(userEmail, originShift.getId(), null, "Shift already has a pass"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ShiftPassActionResponse(userEmail, originShift.getId(), null, "Shift already has a pass"));
         }
 
         List<User> offeredUsers = userService.getUsersListByIds(requestBody.offeredUsers());
@@ -168,11 +172,11 @@ public class ShiftPassController {
         }
 
         log.info("[{}] Shift pass created successfully", shiftPass.getId());
-        return ResponseEntity.ok(new ShiftPassResponse(userEmail, shiftPass.getOriginalShiftId(), shiftPass.getId(), "Shift Pass created successfully"));
+        return ResponseEntity.ok(new ShiftPassActionResponse(userEmail, shiftPass.getOriginalShiftId(), shiftPass.getId(), "Shift Pass created successfully"));
     }
 
     @DeleteMapping(value = "/delete/{shift_pass_id}")
-    public ResponseEntity<ShiftPassResponse> deleteShiftPass(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @PathVariable("shift_pass_id") Long shiftPassId) {
+    public ResponseEntity<ShiftPassActionResponse> deleteShiftPass(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @PathVariable("shift_pass_id") Long shiftPassId) {
 
         try {
             log.info("Deleting originShift pass");
@@ -208,7 +212,7 @@ public class ShiftPassController {
             }
 
             shiftPassService.deleteShiftPassAndUpdateShift(shiftPass, originShift);
-            return ResponseEntity.ok(new ShiftPassResponse(userEmail, shiftPass.getOriginalShiftId(), shiftPass.getId(), "Shift Pass deleted successfully"));
+            return ResponseEntity.ok(new ShiftPassActionResponse(userEmail, shiftPass.getOriginalShiftId(), shiftPass.getId(), "Shift Pass deleted successfully"));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -216,7 +220,7 @@ public class ShiftPassController {
     }
 
     @PostMapping(value = "/accept/{shiftPassId}")
-    public ResponseEntity<ShiftPassResponse> acceptShiftPass(
+    public ResponseEntity<ShiftPassActionResponse> acceptShiftPass(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @PathVariable("shiftPassId") Long shiftPassId,
             @RequestParam("locationId") Long locationId) {
@@ -272,7 +276,7 @@ public class ShiftPassController {
                 shiftPassService.updateOriginalShiftAndShiftPassAndCreateNewShift(shiftPass, newShift, originShift);
 
                 log.info("[{}] Shift pass accepted successfully", shiftPassId);
-                return ResponseEntity.ok(new ShiftPassResponse(userEmail, shiftPass.getOriginalShiftId(), shiftPass.getId(), "Shift Pass accepted successfully"));
+                return ResponseEntity.ok(new ShiftPassActionResponse(userEmail, shiftPass.getOriginalShiftId(), shiftPass.getId(), "Shift Pass accepted successfully"));
             } else {
                 log.info("[{}] User not found in offered users", shiftPassId);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

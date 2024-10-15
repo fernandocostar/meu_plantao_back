@@ -4,8 +4,8 @@ import com.example.loginauthapi.domain.location.Location;
 import com.example.loginauthapi.domain.shift.Shift;
 import com.example.loginauthapi.domain.shiftpass.ShiftPass;
 import com.example.loginauthapi.domain.user.User;
-import com.example.loginauthapi.dto.ShiftPassRequest;
-import com.example.loginauthapi.dto.ShiftPassResponse;
+import com.example.loginauthapi.dto.shiftpass.ShiftPassRequest;
+import com.example.loginauthapi.dto.shiftpass.ShiftPassActionResponse;
 import com.example.loginauthapi.infra.security.TokenService;
 import com.example.loginauthapi.services.LocationService;
 import com.example.loginauthapi.services.ShiftPassService;
@@ -104,7 +104,7 @@ public class ShiftPassControllerTest {
         when(shiftPassService.createShiftPass(anyLong(), anyString(), anyList())).thenReturn(shiftPass);
 
         // Act
-        ResponseEntity<ShiftPassResponse> response = shiftPassController.createShiftPass(authorizationHeader, request);
+        ResponseEntity<ShiftPassActionResponse> response = shiftPassController.createShiftPass(authorizationHeader, request);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -121,7 +121,7 @@ public class ShiftPassControllerTest {
         when(shiftService.findById(anyLong())).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<ShiftPassResponse> response = shiftPassController.createShiftPass(authorizationHeader, request);
+        ResponseEntity<ShiftPassActionResponse> response = shiftPassController.createShiftPass(authorizationHeader, request);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -143,7 +143,7 @@ public class ShiftPassControllerTest {
         when(shiftService.findById(shiftPass.getOriginalShiftId())).thenReturn(Optional.of(shift));
 
         // Act
-        ResponseEntity<ShiftPassResponse> response = shiftPassController.deleteShiftPass(authorizationHeader, 1L);
+        ResponseEntity<ShiftPassActionResponse> response = shiftPassController.deleteShiftPass(authorizationHeader, 1L);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -178,7 +178,7 @@ public class ShiftPassControllerTest {
         when(shiftService.findById(shiftPass.getOriginalShiftId())).thenReturn(Optional.of(originShift));
 
         // Act
-        ResponseEntity<ShiftPassResponse> response = shiftPassController.acceptShiftPass(authorizationHeader, shiftPassId, locationId);
+        ResponseEntity<ShiftPassActionResponse> response = shiftPassController.acceptShiftPass(authorizationHeader, shiftPassId, locationId);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());

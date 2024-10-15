@@ -1,4 +1,4 @@
-package com.example.loginauthapi.dto;
+package com.example.loginauthapi.dto.shiftpass;
 
 import com.example.loginauthapi.domain.shiftpass.ShiftPass;
 import lombok.Getter;

@@ -40,7 +40,7 @@ public class AccountController {
             }
 
             User user = userService.getByEmail(userEmail).orElseThrow(() -> {
-                log.error("User not found: {}", userEmail);
+                log.info("User not found: {}", userEmail);
                 return new NoSuchElementException("User not found");
             });
 
@@ -49,13 +49,15 @@ public class AccountController {
                     user.getProfessionalType(), user.getProfessionalRegister()
             );
 
+            log.info("[{}] User info fetched", userEmail);
+
             return ResponseEntity.ok(responseDTO);
 
         } catch (NoSuchElementException e) {
-            log.error("Error fetching user info: {}", e.getMessage());
+            log.info("Error fetching user info: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            log.error("Unexpected error: {}", e.getMessage());
+            log.info("Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
