@@ -4,6 +4,7 @@ import com.example.loginauthapi.domain.location.Location;
 import com.example.loginauthapi.domain.shift.Shift;
 import com.example.loginauthapi.domain.shiftpass.ShiftPass;
 import com.example.loginauthapi.domain.user.User;
+import com.example.loginauthapi.dto.OfferedShiftPassesResponse;
 import com.example.loginauthapi.dto.ShiftPassRequest;
 import com.example.loginauthapi.dto.ShiftPassResponse;
 import com.example.loginauthapi.infra.security.TokenService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -73,7 +75,7 @@ public class ShiftPassController {
     }
 
     @GetMapping(value="/get/offeredShifts")
-    public ResponseEntity<List<ShiftPass>> getOfferedShifts(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+    public ResponseEntity<List<OfferedShiftPassesResponse>> getOfferedShifts(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 
         Optional<String> userEmailOpt = validateAuthorization(authorizationHeader);
         if (userEmailOpt.isEmpty()) {
@@ -83,10 +85,11 @@ public class ShiftPassController {
 
         logUserAction("Getting offered shifts", userEmail);
 
-        List<ShiftPass> offeredShifts = shiftPassService.getOfferedShiftsByUserEmail(userEmail);
+        List<OfferedShiftPassesResponse> offeredShifts = shiftPassService.getOfferedShiftsByUserEmail(userEmail);
 
         logUserAction("Offered shifts returned", userEmail);
         return ResponseEntity.ok(offeredShifts);
+
     }
 
     @GetMapping(value = "/get/{shift_pass_id}")
@@ -108,6 +111,28 @@ public class ShiftPassController {
         ShiftPass shiftPass = optionalShiftPass.get();
         logShiftPassAction("Shift pass returned", shiftPassId);
         log.debug(shiftPass.toString());
+
+        return ResponseEntity.ok(shiftPass);
+    }
+
+    @GetMapping(value = "/get/")
+    public ResponseEntity<ShiftPass> getShiftPassByShiftId(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestParam("originShiftId") Long originShiftId) {
+
+        Optional<String> userEmailOpt = validateAuthorization(authorizationHeader);
+        if (userEmailOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String userEmail = userEmailOpt.get();
+
+        logUserAction("Getting shift pass by Shift ID", userEmail);
+
+        ShiftPass shiftPass = shiftPassService.getShiftPassByOriginShiftId(originShiftId);
+        if (shiftPass == null) {
+            logUserAction("Shift pass not found", userEmail);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        logShiftPassAction("Returning shift pass", shiftPass.getId());
 
         return ResponseEntity.ok(shiftPass);
     }

@@ -3,6 +3,7 @@ package com.example.loginauthapi.services;
 import com.example.loginauthapi.domain.shift.Shift;
 import com.example.loginauthapi.domain.shiftpass.ShiftPass;
 import com.example.loginauthapi.domain.user.User;
+import com.example.loginauthapi.dto.OfferedShiftPassesResponse;
 import com.example.loginauthapi.repositories.ShiftPassRepository;
 import com.example.loginauthapi.repositories.ShiftRepository;
 import com.example.loginauthapi.repositories.UserRepository;
@@ -10,9 +11,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
@@ -32,14 +35,22 @@ public class ShiftPassService {
         return shiftPassRepository.findById(id);
     }
 
-    public List<ShiftPass> getOfferedShiftsByUserEmail(String userEmail) {
+    public List<OfferedShiftPassesResponse> getOfferedShiftsByUserEmail(String userEmail) {
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
         if (optionalUser.isEmpty()) {
             return emptyList();
         }
 
         User user = optionalUser.get();
-        return shiftPassRepository.findByOfferedUsersContaining(user);
+        List<ShiftPass> offeredShifts = shiftPassRepository.findByOfferedUsersContaining(user);
+        return offeredShifts.stream()
+                .map(OfferedShiftPassesResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public ShiftPass getShiftPassByOriginShiftId(Long shiftId) {
+        Optional<ShiftPass> optShiftPass = shiftPassRepository.findByOriginalShiftId(shiftId);
+        return optShiftPass.orElse(null);
     }
 
     public void save(ShiftPass shiftPass) {

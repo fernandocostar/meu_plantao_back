@@ -8,11 +8,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ShiftPassRepository extends JpaRepository<ShiftPass, Long> {
 
     // Query to find ShiftPasses where the given user appears in any role
     @Query("SELECT sp FROM ShiftPass sp WHERE :user MEMBER OF sp.offeredUsers AND sp.active = true")
     List<ShiftPass> findByOfferedUsersContaining(@Param("user") User user);
+
+    @Query("SELECT sp FROM ShiftPass sp WHERE sp.originalShiftId = :shiftId AND sp.active = true")
+    Optional<ShiftPass> findByOriginalShiftId(Long shiftId);
 
 }
