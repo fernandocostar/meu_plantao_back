@@ -12,6 +12,7 @@ public class OfferedShiftPassesResponse {
 
     private Long id;
     private Long originalShiftId;
+    private String shiftOwnerName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Boolean isActive;
@@ -21,6 +22,7 @@ public class OfferedShiftPassesResponse {
     public OfferedShiftPassesResponse(ShiftPass shiftPass) {
         this.id = shiftPass.getId();
         this.originalShiftId = shiftPass.getOriginalShiftId();
+        this.shiftOwnerName = shiftPass.getOwnerName();
         this.startTime = shiftPass.getStartTime();
         this.endTime = shiftPass.getEndTime();
         this.isActive = shiftPass.isActive();

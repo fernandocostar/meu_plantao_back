@@ -144,6 +144,8 @@ public class ShiftPassController {
     @PostMapping(value = "/create/")
     public ResponseEntity<ShiftPassActionResponse> createShiftPass(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody ShiftPassRequest requestBody) {
 
+        log.debug(requestBody.toString());
+
         Optional<String> userEmailOpt = validateAuthorization(authorizationHeader);
         if (userEmailOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

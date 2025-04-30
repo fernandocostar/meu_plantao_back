@@ -32,7 +32,7 @@ public class AuthController {
             User user = this.userService.getByEmail(body.email()).orElseThrow(() -> new RuntimeException("Invalid email or password, please try again"));
             if (passwordEncoder.matches(body.password(), user.getPassword())) {
                 String token = this.tokenService.generateToken(user);
-                return ResponseEntity.ok(new ResponseDTO(user.getName(), token, user.getEmail()));
+                return ResponseEntity.ok(new ResponseDTO(user.getName(), token, user.getEmail(), user.getCity(), user.getProfessionalRegister(), user.getProfessionalType(), user.getState()));
             }
             throw new RuntimeException("Invalid email or password, please try again");
         } catch (RuntimeException e) {
@@ -58,7 +58,7 @@ public class AuthController {
             this.userService.save(newUser);
 
             String token = this.tokenService.generateToken(newUser);
-            return ResponseEntity.ok(new ResponseDTO(newUser.getName(), token, newUser.getEmail()));
+            return ResponseEntity.ok(new ResponseDTO(newUser.getName(), token, newUser.getEmail(), newUser.getCity(), newUser.getProfessionalRegister(), newUser.getProfessionalType(), newUser.getState()));
         }
         return ResponseEntity.badRequest().body(new ErrorResponseDTO("Error while registering. Please verify if the email is already in use or contact the support team."));
     }

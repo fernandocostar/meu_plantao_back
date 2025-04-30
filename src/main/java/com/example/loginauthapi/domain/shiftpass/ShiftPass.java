@@ -30,6 +30,9 @@ public class ShiftPass {
     @JsonIgnoreProperties({"shifts", "createdShiftPasses", "offeredShiftPasses"})
     private User createdBy;
 
+    @Column(name = "owner_name", nullable = false)
+    private String ownerName;
+
     @Column(nullable = false)
     private boolean active;
 

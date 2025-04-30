@@ -76,6 +76,7 @@ public class ShiftPassService {
 
             //set passing basic info
             newShiftPass.setCreatedBy(user);
+            newShiftPass.setOwnerName(user.getName());
             newShiftPass.setActive(true);
             newShiftPass.setOfferedUsers(emptyList());
             newShiftPass.setFinalUser(null);

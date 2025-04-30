@@ -63,6 +63,9 @@ public class ShiftController {
 
     @PostMapping(value = "/createShift", produces = "application/json; charset=UTF-8")
     public ResponseEntity<Shift> createShift(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestBody ShiftRequestDTO body) {
+
+        log.debug(body.toString());
+
         try {
             if (!this.hasAuthorization(authorizationHeader)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
