@@ -6,6 +6,7 @@ import com.example.loginauthapi.domain.shiftpass.ShiftPass;
 import com.example.loginauthapi.domain.user.User;
 import com.example.loginauthapi.dto.shiftpass.ShiftPassRequest;
 import com.example.loginauthapi.dto.shiftpass.ShiftPassActionResponse;
+import com.example.loginauthapi.dto.shiftpass.ShiftPassResponse;
 import com.example.loginauthapi.infra.security.TokenService;
 import com.example.loginauthapi.services.LocationService;
 import com.example.loginauthapi.services.ShiftPassService;
@@ -63,7 +64,7 @@ public class ShiftPassControllerTest {
         when(shiftPassService.findById(shiftPassId)).thenReturn(Optional.of(shiftPass));
 
         // Act
-        ResponseEntity<ShiftPass> response = shiftPassController.getShiftPass(authorizationHeader, shiftPassId);
+        ResponseEntity<ShiftPassResponse> response = shiftPassController.getShiftPass(authorizationHeader, shiftPassId);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -78,7 +79,7 @@ public class ShiftPassControllerTest {
         when(tokenService.validateToken(anyString())).thenReturn(null);
 
         // Act
-        ResponseEntity<ShiftPass> response = shiftPassController.getShiftPass(authorizationHeader, 1L);
+        ResponseEntity<ShiftPassResponse> response = shiftPassController.getShiftPass(authorizationHeader, 1L);
 
         // Assert
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
