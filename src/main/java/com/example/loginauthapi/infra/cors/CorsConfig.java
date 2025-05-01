@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "https://meu-plantao-front-js-3s7l.vercel.app")
+                .allowedOrigins("http://localhost:3000", "https://meuplantao.online", "https://www.meuplantao.online")
                 .allowedMethods("GET", "POST", "DELETE", "PUT", "OPTIONS")
                 .allowedHeaders("*")
                 .maxAge(3600);
