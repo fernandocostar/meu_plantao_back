@@ -26,6 +26,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
+@CrossOrigin
 @RequestMapping("/shifts/pass")
 @RequiredArgsConstructor
 public class ShiftPassController {
