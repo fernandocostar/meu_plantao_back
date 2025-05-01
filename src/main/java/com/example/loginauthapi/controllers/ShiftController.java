@@ -23,7 +23,6 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@CrossOrigin
 @RequestMapping("/shifts")
 @RequiredArgsConstructor
 public class ShiftController {

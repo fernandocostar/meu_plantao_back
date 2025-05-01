@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/account")
 @RequiredArgsConstructor
 public class AccountController {

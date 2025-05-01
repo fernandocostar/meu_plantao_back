@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/locations")
 @RequiredArgsConstructor
 public class LocationController {
